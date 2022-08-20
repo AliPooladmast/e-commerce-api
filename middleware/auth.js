@@ -8,8 +8,16 @@ const verifyToken = (req, res, next) => {
   jwt.verify(token, process.env.TOKEN_SECRET_KEY, (err, user) => {
     if (err) return res.status(403).json("token is not valid");
     req.user = user;
-    return next();
+    next();
   });
 };
 
-module.exports = { verifyToken };
+const verifyTokenAutorize = (req, res, next) => {
+  verifyToken(req, res, () => {
+    if (!req.user.id === req.params.id && !req.user.isAdmin)
+      return res.status(403).json("not allowed to do that");
+    next();
+  });
+};
+
+module.exports = { verifyToken, verifyTokenAutorize };
