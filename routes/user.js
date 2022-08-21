@@ -37,4 +37,14 @@ router.get("/:id", verifyTokenAdmin, async (req, res) => {
   res.json(other);
 });
 
+//Get All Users
+router.get("/", verifyTokenAdmin, async (req, res) => {
+  const users = await User.find();
+  const safeUsers = users.map((user) => {
+    const { password, ...other } = user._doc;
+    return other;
+  });
+  res.json(safeUsers);
+});
+
 module.exports = router;
