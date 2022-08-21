@@ -39,7 +39,9 @@ router.get("/:id", verifyTokenAdmin, async (req, res) => {
 
 //Get All Users
 router.get("/", verifyTokenAdmin, async (req, res) => {
-  const users = await User.find();
+  const users = req.query.new
+    ? await User.find().sort({ _id: -1 }).limit(5)
+    : await User.find();
   const safeUsers = users.map((user) => {
     const { password, ...other } = user._doc;
     return other;
