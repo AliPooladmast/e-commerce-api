@@ -1,4 +1,7 @@
-const { verifyTokenAutorize } = require("../middleware/verifyToken");
+const {
+  verifyTokenAutorize,
+  verifyTokenAdmin,
+} = require("../middleware/verifyToken");
 const router = require("express").Router();
 const CryptoJS = require("crypto-js");
 const User = require("../models/User");
@@ -25,6 +28,13 @@ router.put("/:id", verifyTokenAutorize, async (req, res) => {
 router.delete("/:id", verifyTokenAutorize, async (req, res) => {
   await User.findByIdAndDelete(req.params.id);
   res.json("user has been deleted...");
+});
+
+//Get User
+router.get("/:id", verifyTokenAdmin, async (req, res) => {
+  const user = await User.findById(req.params.id);
+  const { password, ...other } = user._doc;
+  res.json(other);
 });
 
 module.exports = router;
