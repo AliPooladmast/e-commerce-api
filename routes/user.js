@@ -3,6 +3,7 @@ const router = require("express").Router();
 const CryptoJS = require("crypto-js");
 const User = require("../models/User");
 
+//Upadate User
 router.put("/:id", verifyTokenAutorize, async (req, res) => {
   if (req.body.password) {
     req.body.password = CryptoJS.AES.encrypt(
@@ -18,6 +19,12 @@ router.put("/:id", verifyTokenAutorize, async (req, res) => {
   );
 
   res.json(updatedUser);
+});
+
+//Delete User
+router.delete("/:id", verifyTokenAutorize, async (req, res) => {
+  await User.findByIdAndDelete(req.params.id);
+  res.json("user has been deleted...");
 });
 
 module.exports = router;
