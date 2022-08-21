@@ -1,7 +1,7 @@
 const jwt = require("jsonwebtoken");
 
 const verifyToken = (req, res, next) => {
-  const token = req.headers.token.split(" ")[1];
+  const token = req.headers.token?.split(" ")[1];
   if (!token)
     return res.status(401).json("access denied, token is not provided");
 
@@ -20,4 +20,12 @@ const verifyTokenAutorize = (req, res, next) => {
   });
 };
 
-module.exports = { verifyToken, verifyTokenAutorize };
+const verifyTokenAdmin = (req, res, next) => {
+  verifyToken(req, res, () => {
+    if (!req.user.isAdmin)
+      return res.status(403).json("not allowed to do that");
+    next();
+  });
+};
+
+module.exports = { verifyToken, verifyTokenAutorize, verifyTokenAdmin };
