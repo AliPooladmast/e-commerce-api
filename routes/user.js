@@ -31,7 +31,7 @@ router.delete("/:id", verifyTokenAutorize, async (req, res) => {
 });
 
 //Get User
-router.get("/:id", verifyTokenAdmin, async (req, res) => {
+router.get("/find/:id", verifyTokenAdmin, async (req, res) => {
   const user = await User.findById(req.params.id);
   const { password, ...other } = user._doc;
   res.json(other);
@@ -47,6 +47,19 @@ router.get("/", verifyTokenAdmin, async (req, res) => {
     return other;
   });
   res.json(safeUsers);
+});
+
+//Get User Stats
+router.get("/stats", verifyTokenAdmin, async (req, res) => {
+  const date = new Date();
+  const lastYear = new Date(date.setFullYear(date.getFullYear() - 1));
+
+  const data = await User.aggregate([
+    { $match: { createdAt: { $gte: lastYear } } },
+    { $project: { month: { $month: "$createdAt" } } },
+    { $group: { _id: "$month", total: { $sum: 1 } } },
+  ]);
+  res.json(data);
 });
 
 module.exports = router;
