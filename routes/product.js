@@ -37,29 +37,21 @@ router.get("/find/:id", async (req, res) => {
   res.json(product);
 });
 
-// //Get All Users
-// router.get("/", verifyTokenAdmin, async (req, res) => {
-//   const users = req.query.new
-//     ? await User.find().sort({ _id: -1 }).limit(5)
-//     : await User.find();
-//   const safeUsers = users.map((user) => {
-//     const { password, ...other } = user._doc;
-//     return other;
-//   });
-//   res.json(safeUsers);
-// });
+//Get All Products
+router.get("/", async (req, res) => {
+  const qNew = req.query.new;
+  const qCategory = req.query.category;
+  let products;
 
-// //Get User Stats
-// router.get("/stats", verifyTokenAdmin, async (req, res) => {
-//   const date = new Date();
-//   const lastYear = new Date(date.setFullYear(date.getFullYear() - 1));
+  if (qNew) {
+    products = await Product.find().sort({ createdAt: -1 }).limit(1);
+  } else if (qCategory) {
+    products = await Product.find({ categories: { $in: [qCategory] } });
+  } else {
+    products = await Product.find();
+  }
 
-//   const data = await User.aggregate([
-//     { $match: { createdAt: { $gte: lastYear } } },
-//     { $project: { month: { $month: "$createdAt" } } },
-//     { $group: { _id: "$month", total: { $sum: 1 } } },
-//   ]);
-//   res.json(data);
-// });
+  res.json(products);
+});
 
 module.exports = router;
