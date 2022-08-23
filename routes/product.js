@@ -1,0 +1,53 @@
+const router = require("express").Router();
+const Product = require("../models/Product");
+const CryptoJS = require("crypto-js");
+const jwt = require("jsonwebtoken");
+const { verifyTokenAdmin } = require("../middleware/verifyToken");
+
+//Create Product
+router.post("/", verifyTokenAdmin, async (req, res) => {
+  const newProduct = new Product(req.body);
+
+  const savedProduct = await newProduct.save();
+  res.json(savedProduct);
+});
+
+// //Register
+// router.post("/register", async (req, res) => {
+//   const newUser = new User({
+//     username: req.body.username,
+//     email: req.body.email,
+//     password: CryptoJS.AES.encrypt(
+//       req.body.password,
+//       process.env.PASSWORD_SECRET_KEY
+//     ).toString(),
+//   });
+
+//   const savedUser = await newUser.save();
+//   res.status(201).json(savedUser);
+// });
+
+// //Login
+// router.post("/login", async (req, res) => {
+//   const user = await User.findOne({ username: req.body.username });
+//   if (!user) return res.status(401).json("Wrong Credentials");
+
+//   const originalPassword = CryptoJS.AES.decrypt(
+//     user.password,
+//     process.env.PASSWORD_SECRET_KEY
+//   ).toString(CryptoJS.enc.Utf8);
+
+//   if (originalPassword !== req.body.password)
+//     return res.status(401).json("Wrong Credentials");
+
+//   const accessToken = jwt.sign(
+//     { id: user._id, isAdmin: user.isAdmin },
+//     process.env.TOKEN_SECRET_KEY,
+//     { expiresIn: "3d" }
+//   );
+//   const { password, ...others } = user._doc;
+
+//   res.header("x-auth-token", accessToken).json(others);
+// });
+
+module.exports = router;
