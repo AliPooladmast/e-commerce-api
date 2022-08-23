@@ -25,6 +25,12 @@ router.put("/:id", verifyTokenAdmin, async (req, res) => {
   res.json(updatedProduct);
 });
 
+//Delete Product
+router.delete("/:id", verifyTokenAdmin, async (req, res) => {
+  await Product.findByIdAndDelete(req.params.id);
+  res.json("product has been deleted...");
+});
+
 // //Get User
 // router.get("/find/:id", verifyTokenAdmin, async (req, res) => {
 //   const user = await User.findById(req.params.id);
