@@ -1,8 +1,10 @@
+const {
+  verifyTokenAutorize,
+  verifyTokenAdmin,
+} = require("../middleware/verifyToken");
 const router = require("express").Router();
-const Product = require("../models/Product");
 const CryptoJS = require("crypto-js");
-const jwt = require("jsonwebtoken");
-const { verifyTokenAdmin } = require("../middleware/verifyToken");
+const Product = require("../models/Product");
 
 //Create Product
 router.post("/", verifyTokenAdmin, async (req, res) => {
@@ -12,42 +14,47 @@ router.post("/", verifyTokenAdmin, async (req, res) => {
   res.json(savedProduct);
 });
 
-// //Register
-// router.post("/register", async (req, res) => {
-//   const newUser = new User({
-//     username: req.body.username,
-//     email: req.body.email,
-//     password: CryptoJS.AES.encrypt(
-//       req.body.password,
-//       process.env.PASSWORD_SECRET_KEY
-//     ).toString(),
-//   });
+//Upadate Product
+router.put("/:id", verifyTokenAdmin, async (req, res) => {
+  updatedProduct = await Product.findByIdAndUpdate(
+    req.params.id,
+    { $set: req.body },
+    { new: true }
+  );
 
-//   const savedUser = await newUser.save();
-//   res.status(201).json(savedUser);
+  res.json(updatedProduct);
+});
+
+// //Get User
+// router.get("/find/:id", verifyTokenAdmin, async (req, res) => {
+//   const user = await User.findById(req.params.id);
+//   const { password, ...other } = user._doc;
+//   res.json(other);
 // });
 
-// //Login
-// router.post("/login", async (req, res) => {
-//   const user = await User.findOne({ username: req.body.username });
-//   if (!user) return res.status(401).json("Wrong Credentials");
+// //Get All Users
+// router.get("/", verifyTokenAdmin, async (req, res) => {
+//   const users = req.query.new
+//     ? await User.find().sort({ _id: -1 }).limit(5)
+//     : await User.find();
+//   const safeUsers = users.map((user) => {
+//     const { password, ...other } = user._doc;
+//     return other;
+//   });
+//   res.json(safeUsers);
+// });
 
-//   const originalPassword = CryptoJS.AES.decrypt(
-//     user.password,
-//     process.env.PASSWORD_SECRET_KEY
-//   ).toString(CryptoJS.enc.Utf8);
+// //Get User Stats
+// router.get("/stats", verifyTokenAdmin, async (req, res) => {
+//   const date = new Date();
+//   const lastYear = new Date(date.setFullYear(date.getFullYear() - 1));
 
-//   if (originalPassword !== req.body.password)
-//     return res.status(401).json("Wrong Credentials");
-
-//   const accessToken = jwt.sign(
-//     { id: user._id, isAdmin: user.isAdmin },
-//     process.env.TOKEN_SECRET_KEY,
-//     { expiresIn: "3d" }
-//   );
-//   const { password, ...others } = user._doc;
-
-//   res.header("x-auth-token", accessToken).json(others);
+//   const data = await User.aggregate([
+//     { $match: { createdAt: { $gte: lastYear } } },
+//     { $project: { month: { $month: "$createdAt" } } },
+//     { $group: { _id: "$month", total: { $sum: 1 } } },
+//   ]);
+//   res.json(data);
 // });
 
 module.exports = router;
