@@ -31,12 +31,11 @@ router.delete("/:id", verifyTokenAdmin, async (req, res) => {
   res.json("product has been deleted...");
 });
 
-// //Get User
-// router.get("/find/:id", verifyTokenAdmin, async (req, res) => {
-//   const user = await User.findById(req.params.id);
-//   const { password, ...other } = user._doc;
-//   res.json(other);
-// });
+//Get Product
+router.get("/find/:id", async (req, res) => {
+  const product = await Product.findById(req.params.id);
+  res.json(product);
+});
 
 // //Get All Users
 // router.get("/", verifyTokenAdmin, async (req, res) => {
