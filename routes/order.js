@@ -32,4 +32,10 @@ router.delete("/:id", verifyTokenAutorize, async (req, res) => {
   res.json("order has been deleted...");
 });
 
+//Get User Order
+router.get("/find/:userId", verifyTokenAutorize, async (req, res) => {
+  const order = await Order.find({ userId: req.params.userId });
+  res.json(order);
+});
+
 module.exports = router;
