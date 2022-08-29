@@ -38,4 +38,10 @@ router.get("/find/:userId", verifyTokenAutorize, async (req, res) => {
   res.json(order);
 });
 
+//Get All Orders
+router.get("/", verifyTokenAdmin, async (req, res) => {
+  const orders = await Order.find();
+  res.json(orders);
+});
+
 module.exports = router;
