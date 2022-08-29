@@ -32,4 +32,10 @@ router.delete("/:id", verifyTokenAutorize, async (req, res) => {
   res.json("cart has been deleted...");
 });
 
+//Get User Cart
+router.get("/find/:userId", async (req, res) => {
+  const cart = await Cart.findOne({ userId: req.params.userId });
+  res.json(cart);
+});
+
 module.exports = router;
