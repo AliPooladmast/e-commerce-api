@@ -15,4 +15,15 @@ router.post("/", verifyToken, async (req, res) => {
   res.json(savedOrder);
 });
 
+//Upadate Order
+router.put("/:id", verifyTokenAdmin, async (req, res) => {
+  updatedOrder = await Order.findByIdAndUpdate(
+    req.params.id,
+    { $set: req.body },
+    { new: true }
+  );
+
+  res.json(updatedOrder);
+});
+
 module.exports = router;
