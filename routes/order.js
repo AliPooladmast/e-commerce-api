@@ -26,4 +26,10 @@ router.put("/:id", verifyTokenAdmin, async (req, res) => {
   res.json(updatedOrder);
 });
 
+//Delete Order
+router.delete("/:id", verifyTokenAutorize, async (req, res) => {
+  await Order.findByIdAndDelete(req.params.id);
+  res.json("order has been deleted...");
+});
+
 module.exports = router;
