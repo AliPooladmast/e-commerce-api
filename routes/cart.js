@@ -38,4 +38,10 @@ router.get("/find/:userId", async (req, res) => {
   res.json(cart);
 });
 
+//Get All Carts
+router.get("/", async (req, res) => {
+  const carts = await Cart.find();
+  res.json(carts);
+});
+
 module.exports = router;
