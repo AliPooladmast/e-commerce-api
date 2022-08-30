@@ -33,13 +33,13 @@ router.delete("/:id", verifyTokenAutorize, async (req, res) => {
 });
 
 //Get User Cart
-router.get("/find/:userId", async (req, res) => {
+router.get("/find/:userId", verifyTokenAutorize, async (req, res) => {
   const cart = await Cart.findOne({ userId: req.params.userId });
   res.json(cart);
 });
 
 //Get All Carts
-router.get("/", async (req, res) => {
+router.get("/", verifyTokenAdmin, async (req, res) => {
   const carts = await Cart.find();
   res.json(carts);
 });
