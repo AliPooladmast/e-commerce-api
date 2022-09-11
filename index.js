@@ -10,7 +10,6 @@ const orderRoute = require("./routes/order");
 const stripeRoute = require("./routes/stripe");
 const error = require("./middleware/error");
 const cors = require("cors");
-require("express-async-errors");
 
 dotenv.config();
 
@@ -19,6 +18,7 @@ mongoose
   .then(() => console.log("Connected to DB"))
   .catch((err) => console.log(err));
 
+require("./startup/logging")();
 app.use(cors());
 app.use(express.json());
 app.use("/api/auth", authRoute);
