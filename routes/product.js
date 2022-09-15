@@ -5,6 +5,7 @@ const {
 const router = require("express").Router();
 const CryptoJS = require("crypto-js");
 const Product = require("../models/Product");
+const validateObjectId = require("../middleware/validateObjectId");
 
 //Create Product
 router.post("/", verifyTokenAdmin, async (req, res) => {
@@ -15,7 +16,7 @@ router.post("/", verifyTokenAdmin, async (req, res) => {
 });
 
 //Upadate Product
-router.put("/:id", verifyTokenAdmin, async (req, res) => {
+router.put("/:id", [verifyTokenAdmin, validateObjectId], async (req, res) => {
   updatedProduct = await Product.findByIdAndUpdate(
     req.params.id,
     { $set: req.body },
@@ -26,13 +27,17 @@ router.put("/:id", verifyTokenAdmin, async (req, res) => {
 });
 
 //Delete Product
-router.delete("/:id", verifyTokenAdmin, async (req, res) => {
-  await Product.findByIdAndDelete(req.params.id);
-  res.json("product has been deleted...");
-});
+router.delete(
+  "/:id",
+  [verifyTokenAdmin, validateObjectId],
+  async (req, res) => {
+    await Product.findByIdAndDelete(req.params.id);
+    res.json("product has been deleted...");
+  }
+);
 
 //Get Product
-router.get("/find/:id", async (req, res) => {
+router.get("/find/:id", validateObjectId, async (req, res) => {
   const product = await Product.findById(req.params.id);
   res.json(product);
 });

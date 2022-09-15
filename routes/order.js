@@ -6,6 +6,7 @@ const {
 const router = require("express").Router();
 const CryptoJS = require("crypto-js");
 const Order = require("../models/Order");
+const validateObjectId = require("../middleware/validateObjectId");
 
 //Create Order
 router.post("/", verifyToken, async (req, res) => {
@@ -16,7 +17,7 @@ router.post("/", verifyToken, async (req, res) => {
 });
 
 //Upadate Order
-router.put("/:id", verifyTokenAdmin, async (req, res) => {
+router.put("/:id", [verifyTokenAdmin, validateObjectId], async (req, res) => {
   updatedOrder = await Order.findByIdAndUpdate(
     req.params.id,
     { $set: req.body },
@@ -27,16 +28,24 @@ router.put("/:id", verifyTokenAdmin, async (req, res) => {
 });
 
 //Delete Order
-router.delete("/:id", verifyTokenAutorize, async (req, res) => {
-  await Order.findByIdAndDelete(req.params.id);
-  res.json("order has been deleted...");
-});
+router.delete(
+  "/:id",
+  [verifyTokenAutorize, validateObjectId],
+  async (req, res) => {
+    await Order.findByIdAndDelete(req.params.id);
+    res.json("order has been deleted...");
+  }
+);
 
 //Get User Order
-router.get("/find/:userId", verifyTokenAutorize, async (req, res) => {
-  const order = await Order.find({ userId: req.params.userId });
-  res.json(order);
-});
+router.get(
+  "/find/:userId",
+  [verifyTokenAutorize, validateObjectId],
+  async (req, res) => {
+    const order = await Order.find({ userId: req.params.userId });
+    res.json(order);
+  }
+);
 
 //Get All Orders
 router.get("/", verifyTokenAdmin, async (req, res) => {
