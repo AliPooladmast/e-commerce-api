@@ -37,8 +37,9 @@ router.post("/login", async (req, res) => {
     { expiresIn: "3d" }
   );
   const { password, ...others } = user._doc;
+  others.token = accessToken;
 
-  res.header("x-auth-token", accessToken).json(others);
+  res.json(others);
 });
 
 module.exports = router;
