@@ -16,7 +16,12 @@ router.post("/register", validateSchema(schema), async (req, res) => {
   });
 
   const savedUser = await newUser.save();
-  res.status(201).json(savedUser);
+
+  const accessToken = savedUser.generateAuthToken();
+  const { password, ...others } = savedUser._doc;
+  others.token = accessToken;
+
+  res.status(201).json(others);
 });
 
 //Login
@@ -32,11 +37,7 @@ router.post("/login", async (req, res) => {
   if (originalPassword !== req.body.password)
     return res.status(401).json("Wrong Credentials");
 
-  const accessToken = jwt.sign(
-    { id: user._id, isAdmin: user.isAdmin },
-    process.env.TOKEN_SECRET_KEY,
-    { expiresIn: "3d" }
-  );
+  const accessToken = user.generateAuthToken();
   const { password, ...others } = user._doc;
   others.token = accessToken;
 
