@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const Joi = require("joi");
 
 const CartSchema = new mongoose.Schema(
   {
@@ -13,4 +14,10 @@ const CartSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-module.exports = mongoose.model("Cart", CartSchema);
+const schema = Joi.object({
+  userId: Joi.string().hex().required(),
+  products: Joi.array().required(),
+});
+
+module.exports.Cart = mongoose.model("Cart", CartSchema);
+module.exports.schema = schema;
