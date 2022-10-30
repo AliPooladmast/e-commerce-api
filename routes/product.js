@@ -4,11 +4,12 @@ const {
 } = require("../middleware/verifyToken");
 const router = require("express").Router();
 const CryptoJS = require("crypto-js");
-const Product = require("../models/Product");
+const { Product, schema } = require("../models/Product");
 const validateObjectId = require("../middleware/validateObjectId");
+const validate = require("../middleware/validateSchema");
 
 //Create Product
-router.post("/", verifyTokenAdmin, async (req, res) => {
+router.post("/", [verifyTokenAdmin, validate(schema)], async (req, res) => {
   const newProduct = new Product(req.body);
 
   const savedProduct = await newProduct.save();
