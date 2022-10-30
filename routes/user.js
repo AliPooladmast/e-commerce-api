@@ -25,6 +25,9 @@ router.put(
       { new: true }
     );
 
+    if (!updatedUser)
+      return res.status(404).json("the user with the current ID was not found");
+
     res.json(updatedUser);
   }
 );
@@ -34,7 +37,11 @@ router.delete(
   "/:id",
   [verifyTokenAutorize, validateObjectId],
   async (req, res) => {
-    await User.findByIdAndDelete(req.params.id);
+    const user = await User.findByIdAndDelete(req.params.id);
+
+    if (!user)
+      return res.status(404).json("the user with the current ID was not found");
+
     res.json("user has been deleted...");
   }
 );
@@ -45,6 +52,10 @@ router.get(
   [verifyTokenAdmin, validateObjectId],
   async (req, res) => {
     const user = await User.findById(req.params.id).select("-password");
+
+    if (!user)
+      return res.status(404).json("the user with the current ID was not found");
+
     res.json(user);
   }
 );
@@ -54,6 +65,8 @@ router.get("/", verifyTokenAdmin, async (req, res) => {
   const users = req.query.new
     ? await User.find().select("-password").sort({ _id: -1 }).limit(5)
     : await User.find().select("-password");
+
+  if (!users?.length > 0) return res.status(404).json("users not found");
 
   res.json(users);
 });
@@ -68,6 +81,9 @@ router.get("/stats", verifyTokenAdmin, async (req, res) => {
     { $project: { month: { $month: "$createdAt" } } },
     { $group: { _id: "$month", total: { $sum: 1 } } },
   ]);
+
+  if (!data?.length > 0) return res.status(404).json("user stats not found");
+
   res.json(data);
 });
 
