@@ -43,7 +43,7 @@ const schema = Joi.object({
     .max(255)
     .required()
     .email({ minDomainSegments: 2, tlds: { allow: ["com", "net"] } }),
-  password: Joi.string().min(5).max(255).required(),
+  password: Joi.string().min(5).max(1024).required(),
 });
 
 module.exports.User = mongoose.model("User", UserSchema);
