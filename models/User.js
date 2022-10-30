@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const Joi = require("joi");
 
 const UserSchema = new mongoose.Schema(
   {
@@ -22,4 +23,15 @@ const UserSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-module.exports = mongoose.model("User", UserSchema);
+const schema = Joi.object({
+  username: Joi.string().min(2).max(50).required(),
+  email: Joi.string()
+    .min(5)
+    .max(255)
+    .required()
+    .email({ minDomainSegments: 2, tlds: { allow: ["com", "net"] } }),
+  password: Joi.string().min(5).max(255).required(),
+});
+
+module.exports.User = mongoose.model("User", UserSchema);
+module.exports.schema = schema;
