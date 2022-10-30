@@ -4,7 +4,7 @@ const {
 } = require("../middleware/verifyToken");
 const router = require("express").Router();
 const CryptoJS = require("crypto-js");
-const User = require("../models/User");
+const { User } = require("../models/User");
 const validateObjectId = require("../middleware/validateObjectId");
 
 //Upadate User
