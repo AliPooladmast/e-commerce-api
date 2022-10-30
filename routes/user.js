@@ -44,22 +44,18 @@ router.get(
   "/find/:id",
   [verifyTokenAdmin, validateObjectId],
   async (req, res) => {
-    const user = await User.findById(req.params.id);
-    const { password, ...other } = user._doc;
-    res.json(other);
+    const user = await User.findById(req.params.id).select("-password");
+    res.json(user);
   }
 );
 
 //Get All Users
 router.get("/", verifyTokenAdmin, async (req, res) => {
   const users = req.query.new
-    ? await User.find().sort({ _id: -1 }).limit(5)
-    : await User.find();
-  const safeUsers = users.map((user) => {
-    const { password, ...other } = user._doc;
-    return other;
-  });
-  res.json(safeUsers);
+    ? await User.find().select("-password").sort({ _id: -1 }).limit(5)
+    : await User.find().select("-password");
+
+  res.json(users);
 });
 
 //Get User Stats
