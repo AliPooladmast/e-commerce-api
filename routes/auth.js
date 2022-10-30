@@ -6,7 +6,10 @@ const validateSchema = require("../middleware/validateSchema");
 
 //Register
 router.post("/register", validateSchema(schema), async (req, res) => {
-  const newUser = new User({
+  let user = await User.findOne({ email: req.body.email });
+  if (user) return res.status(400).json("User already registered.");
+
+  user = new User({
     username: req.body.username,
     email: req.body.email,
     password: CryptoJS.AES.encrypt(
@@ -15,7 +18,7 @@ router.post("/register", validateSchema(schema), async (req, res) => {
     ).toString(),
   });
 
-  const savedUser = await newUser.save();
+  const savedUser = await user.save();
 
   const accessToken = savedUser.generateAuthToken();
   const { password, ...others } = savedUser._doc;
