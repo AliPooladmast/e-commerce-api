@@ -5,11 +5,12 @@ const {
 } = require("../middleware/verifyToken");
 const router = require("express").Router();
 const CryptoJS = require("crypto-js");
-const Order = require("../models/Order");
+const { Order, schema } = require("../models/Order");
 const validateObjectId = require("../middleware/validateObjectId");
+const validate = require("../middleware/validateSchema");
 
 //Create Order
-router.post("/", verifyToken, async (req, res) => {
+router.post("/", [verifyToken, validate(schema)], async (req, res) => {
   const newOrder = new Order(req.body);
 
   const savedOrder = await newOrder.save();

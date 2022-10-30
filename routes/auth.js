@@ -1,11 +1,15 @@
 const router = require("express").Router();
-const User = require("../models/User");
+const { User, schema } = require("../models/User");
 const CryptoJS = require("crypto-js");
 const jwt = require("jsonwebtoken");
+const validateSchema = require("../middleware/validateSchema");
 
 //Register
-router.post("/register", async (req, res) => {
-  const newUser = new User({
+router.post("/register", validateSchema(schema), async (req, res) => {
+  let user = await User.findOne({ email: req.body.email });
+  if (user) return res.status(400).json("User already registered.");
+
+  user = new User({
     username: req.body.username,
     email: req.body.email,
     password: CryptoJS.AES.encrypt(
@@ -14,8 +18,13 @@ router.post("/register", async (req, res) => {
     ).toString(),
   });
 
-  const savedUser = await newUser.save();
-  res.status(201).json(savedUser);
+  const savedUser = await user.save();
+
+  const accessToken = savedUser.generateAuthToken();
+  const { password, ...others } = savedUser._doc;
+  others.token = accessToken;
+
+  res.status(201).json(others);
 });
 
 //Login
@@ -31,11 +40,7 @@ router.post("/login", async (req, res) => {
   if (originalPassword !== req.body.password)
     return res.status(401).json("Wrong Credentials");
 
-  const accessToken = jwt.sign(
-    { id: user._id, isAdmin: user.isAdmin },
-    process.env.TOKEN_SECRET_KEY,
-    { expiresIn: "3d" }
-  );
+  const accessToken = user.generateAuthToken();
   const { password, ...others } = user._doc;
   others.token = accessToken;
 

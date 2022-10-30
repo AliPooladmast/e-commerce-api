@@ -5,11 +5,12 @@ const {
 } = require("../middleware/verifyToken");
 const router = require("express").Router();
 const CryptoJS = require("crypto-js");
-const Cart = require("../models/Cart");
+const { Cart, schema } = require("../models/Cart");
 const validateObjectId = require("../middleware/validateObjectId");
+const validate = require("../middleware/validateSchema");
 
 //Create Cart
-router.post("/", verifyToken, async (req, res) => {
+router.post("/", [verifyToken, validate(schema)], async (req, res) => {
   const newCart = new Cart(req.body);
 
   const savedCart = await newCart.save();
