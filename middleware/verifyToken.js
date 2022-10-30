@@ -7,7 +7,7 @@ const verifyToken = (req, res, next) => {
     return res.status(401).json("access denied, token is not provided");
 
   jwt.verify(token, process.env.TOKEN_SECRET_KEY, (err, user) => {
-    if (err) return res.status(403).json("token is not valid");
+    if (err) return res.status(403).json("access denied, token is not valid");
     req.user = user;
     next();
   });
@@ -16,7 +16,9 @@ const verifyToken = (req, res, next) => {
 const verifyTokenAutorize = (req, res, next) => {
   verifyToken(req, res, () => {
     if (!req.user.id === req.params.id && !req.user.isAdmin)
-      return res.status(403).json("not allowed to do that");
+      return res
+        .status(403)
+        .json("access denied, not enough privileges to perform this action");
     next();
   });
 };
@@ -24,7 +26,9 @@ const verifyTokenAutorize = (req, res, next) => {
 const verifyTokenAdmin = (req, res, next) => {
   verifyToken(req, res, () => {
     if (!req.user.isAdmin)
-      return res.status(403).json("not allowed to do that");
+      return res
+        .status(403)
+        .json("access denied, not enough privileges to perform this action");
     next();
   });
 };
