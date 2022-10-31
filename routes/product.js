@@ -1,9 +1,5 @@
-const {
-  verifyTokenAutorize,
-  verifyTokenAdmin,
-} = require("../middleware/verifyToken");
+const { verifyTokenAdmin } = require("../middleware/verifyToken");
 const router = require("express").Router();
-const CryptoJS = require("crypto-js");
 const { Product, schema } = require("../models/Product");
 const validateObjectId = require("../middleware/validateObjectId");
 const validate = require("../middleware/validateSchema");
@@ -13,16 +9,22 @@ router.post("/", [verifyTokenAdmin, validate(schema)], async (req, res) => {
   const newProduct = new Product(req.body);
 
   const savedProduct = await newProduct.save();
+
   res.json(savedProduct);
 });
 
 //Upadate Product
 router.put("/:id", [verifyTokenAdmin, validateObjectId], async (req, res) => {
-  updatedProduct = await Product.findByIdAndUpdate(
+  const updatedProduct = await Product.findByIdAndUpdate(
     req.params.id,
     { $set: req.body },
     { new: true }
   );
+
+  if (!updatedProduct)
+    return res
+      .status(404)
+      .json("the product with the current ID was not found");
 
   res.json(updatedProduct);
 });
@@ -32,7 +34,13 @@ router.delete(
   "/:id",
   [verifyTokenAdmin, validateObjectId],
   async (req, res) => {
-    await Product.findByIdAndDelete(req.params.id);
+    const product = await Product.findByIdAndDelete(req.params.id);
+
+    if (!product)
+      return res
+        .status(404)
+        .json("the product with the current ID was not found");
+
     res.json("product has been deleted...");
   }
 );
@@ -40,6 +48,12 @@ router.delete(
 //Get Product
 router.get("/find/:id", validateObjectId, async (req, res) => {
   const product = await Product.findById(req.params.id);
+
+  if (!product)
+    return res
+      .status(404)
+      .json("the product with the current ID was not found");
+
   res.json(product);
 });
 
@@ -56,6 +70,8 @@ router.get("/", async (req, res) => {
   } else {
     products = await Product.find();
   }
+
+  if (!products?.length > 0) return res.status(404).json("products not found");
 
   res.json(products);
 });
