@@ -4,7 +4,6 @@ const {
   verifyToken,
 } = require("../middleware/verifyToken");
 const router = require("express").Router();
-const CryptoJS = require("crypto-js");
 const { Cart, schema } = require("../models/Cart");
 const validateObjectId = require("../middleware/validateObjectId");
 const validate = require("../middleware/validateSchema");
@@ -22,11 +21,14 @@ router.put(
   "/:id",
   [verifyTokenAutorize, validateObjectId],
   async (req, res) => {
-    updatedCart = await Cart.findByIdAndUpdate(
+    const updatedCart = await Cart.findByIdAndUpdate(
       req.params.id,
       { $set: req.body },
       { new: true }
     );
+
+    if (!updatedCart)
+      return res.status(404).json("the cart with the current ID was not found");
 
     res.json(updatedCart);
   }
@@ -37,20 +39,37 @@ router.delete(
   "/:id",
   [verifyTokenAutorize, validateObjectId],
   async (req, res) => {
-    await Cart.findByIdAndDelete(req.params.id);
+    const cart = await Cart.findByIdAndDelete(req.params.id);
+
+    if (!cart)
+      return res.status(404).json("the cart with the current ID was not found");
+
     res.json("cart has been deleted...");
   }
 );
 
 //Get User Cart
-router.get("/find/:userId", verifyTokenAutorize, async (req, res) => {
-  const cart = await Cart.findOne({ userId: req.params.userId });
-  res.json(cart);
-});
+router.get(
+  "/find/:id",
+  [verifyTokenAutorize, validateObjectId],
+  async (req, res) => {
+    const cart = await Cart.findOne({ userId: req.params.id });
+
+    if (!cart)
+      return res
+        .status(404)
+        .json("the cart with the current user ID was not found");
+
+    res.json(cart);
+  }
+);
 
 //Get All Carts
 router.get("/", verifyTokenAdmin, async (req, res) => {
   const carts = await Cart.find();
+
+  if (!carts?.length > 0) return res.status(404).json("carts was not found");
+
   res.json(carts);
 });
 
