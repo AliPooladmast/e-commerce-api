@@ -4,11 +4,11 @@ const winston = require("winston");
 const app = express();
 dotenv.config();
 
+require("./startup/env")();
 require("./startup/logging")();
 require("./startup/cors")(app);
 require("./startup/routes")(app);
 require("./startup/db")();
-require("./startup/env")();
 
 const port = process.env.PORT || 5000;
 
