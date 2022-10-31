@@ -14,16 +14,20 @@ router.post("/", [verifyToken, validate(schema)], async (req, res) => {
   const newOrder = new Order(req.body);
 
   const savedOrder = await newOrder.save();
+
   res.json(savedOrder);
 });
 
 //Upadate Order
 router.put("/:id", [verifyTokenAdmin, validateObjectId], async (req, res) => {
-  updatedOrder = await Order.findByIdAndUpdate(
+  const updatedOrder = await Order.findByIdAndUpdate(
     req.params.id,
     { $set: req.body },
     { new: true }
   );
+
+  if (!updatedOrder)
+    return res.status(404).json("the order with the current ID was not found");
 
   res.json(updatedOrder);
 });
@@ -33,17 +37,29 @@ router.delete(
   "/:id",
   [verifyTokenAutorize, validateObjectId],
   async (req, res) => {
-    await Order.findByIdAndDelete(req.params.id);
+    const order = await Order.findByIdAndDelete(req.params.id);
+
+    if (!order)
+      return res
+        .status(404)
+        .json("the order with the current ID was not found");
+
     res.json("order has been deleted...");
   }
 );
 
 //Get User Order
 router.get(
-  "/find/:userId",
+  "/find/:id",
   [verifyTokenAutorize, validateObjectId],
   async (req, res) => {
-    const order = await Order.find({ userId: req.params.userId });
+    const order = await Order.find({ userId: req.params.id });
+
+    if (!order?.length > 0)
+      return res
+        .status(404)
+        .json("orders with the current user ID was not found");
+
     res.json(order);
   }
 );
@@ -51,6 +67,9 @@ router.get(
 //Get All Orders
 router.get("/", verifyTokenAdmin, async (req, res) => {
   const orders = await Order.find();
+
+  if (!orders?.length > 0) return res.status(404).json("orders not found");
+
   res.json(orders);
 });
 
@@ -81,6 +100,8 @@ router.get("/income", verifyTokenAdmin, async (req, res) => {
       },
     },
   ]);
+
+  if (!income?.length > 0) return res.status(404).json("incomes not found");
 
   res.json(income);
 });

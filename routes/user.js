@@ -19,7 +19,7 @@ router.put(
       ).toString();
     }
 
-    updatedUser = await User.findByIdAndUpdate(
+    const updatedUser = await User.findByIdAndUpdate(
       req.params.id,
       { $set: req.body },
       { new: true }
