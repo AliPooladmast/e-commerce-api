@@ -30,7 +30,7 @@ router.post("/register", validateSchema(schema), async (req, res) => {
 //Login
 router.post("/login", async (req, res) => {
   const user = await User.findOne({ username: req.body.username });
-  if (!user) return res.status(401).json("Wrong Credentials");
+  if (!user) return res.status(401).json("User Not Registered");
 
   const originalPassword = CryptoJS.AES.decrypt(
     user.password,
@@ -38,7 +38,7 @@ router.post("/login", async (req, res) => {
   ).toString(CryptoJS.enc.Utf8);
 
   if (originalPassword !== req.body.password)
-    return res.status(401).json("Wrong Credentials");
+    return res.status(401).json("Wrong Password");
 
   const accessToken = user.generateAuthToken();
   const { password, ...others } = user._doc;
