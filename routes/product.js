@@ -61,14 +61,18 @@ router.get("/find/:id", validateObjectId, async (req, res) => {
 router.get("/", async (req, res) => {
   const qNew = req.query.new;
   const qCategory = req.query.category;
+  const qPage = req.query.page;
+  const perPage = 2;
   let products;
 
   if (qNew) {
     products = await Product.find().sort({ createdAt: -1 }).limit(8);
   } else if (qCategory) {
     products = await Product.find({ categories: { $in: [qCategory] } });
-  } else {
-    products = await Product.find();
+  } else if (qPage) {
+    products = await Product.find()
+      .limit(perPage)
+      .skip(perPage * (qPage - 1));
   }
 
   if (!products?.length > 0) return res.status(404).json("products not found");
