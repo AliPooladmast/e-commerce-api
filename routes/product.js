@@ -3,6 +3,7 @@ const router = require("express").Router();
 const { Product, schema } = require("../models/Product");
 const validateObjectId = require("../middleware/validateObjectId");
 const validate = require("../middleware/validateSchema");
+const perPage = 2;
 
 //Create Product
 router.post("/", [verifyTokenAdmin, validate(schema)], async (req, res) => {
@@ -57,12 +58,20 @@ router.get("/find/:id", validateObjectId, async (req, res) => {
   res.json(product);
 });
 
+//Get Products Number of Pages
+router.get("/pages", async (req, res) => {
+  const result = await Product.count();
+
+  if (!result) return res.status(404).json("database is empty");
+
+  res.json(Math.round(result / perPage));
+});
+
 //Get All Products
 router.get("/", async (req, res) => {
   const qNew = req.query.new;
   const qCategory = req.query.category;
   const qPage = req.query.page;
-  const perPage = 2;
   let products;
 
   if (qNew) {
