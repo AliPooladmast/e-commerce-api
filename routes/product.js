@@ -72,6 +72,9 @@ router.get("/", async (req, res) => {
   const qNew = req.query.new;
   const qCategory = req.query.category;
   const qPage = req.query.page;
+  const qSize = req.query.size;
+  const qColor = req.query.color;
+  const qTitle = req.query.title;
   let products;
 
   if (qNew) {
@@ -79,9 +82,12 @@ router.get("/", async (req, res) => {
   } else if (qPage) {
     products = await Product.find({
       ...(qCategory && { categories: { $in: [qCategory] } }),
+      ...(qSize && { size: { $in: [qSize] } }),
+      ...(qColor && { color: { $in: [qColor] } }),
+      ...(qTitle && { title: { $regex: qTitle } }),
     })
-      .limit(perPage)
-      .skip(perPage * (qPage - 1));
+      .skip(perPage * (qPage - 1))
+      .limit(perPage);
   } else {
     products = await Product.find();
   }
