@@ -76,25 +76,37 @@ router.get("/", async (req, res) => {
   const qColor = req.query.color;
   const qTitle = req.query.title;
   let products;
+  let productCount;
 
   if (qNew) {
     products = await Product.find().sort({ createdAt: -1 }).limit(8);
   } else if (qPage) {
-    products = await Product.find({
-      ...(qCategory && { categories: { $in: [qCategory] } }),
-      ...(qSize && { size: { $in: [qSize] } }),
-      ...(qColor && { color: { $in: [qColor] } }),
-      ...(qTitle && { title: { $regex: qTitle } }),
-    })
-      .skip(perPage * (qPage - 1))
-      .limit(perPage);
+    const result = await Product.aggregate([
+      {
+        $match: {
+          ...(qCategory && { categories: { $in: [qCategory] } }),
+          ...(qSize && { size: { $in: [qSize] } }),
+          ...(qColor && { color: { $in: [qColor] } }),
+          ...(qTitle && { title: { $regex: qTitle } }),
+        },
+      },
+      {
+        $facet: {
+          products: [{ $skip: perPage * (qPage - 1) }, { $limit: perPage }],
+          totalCount: [{ $count: "count" }],
+        },
+      },
+    ]);
+
+    products = result[0].products;
+    pageCounts = result[0].totalCount[0].count / perPage;
   } else {
     products = await Product.find();
   }
 
   if (!products?.length > 0) return res.status(404).json("products not found");
 
-  res.json(products);
+  res.json({ products, pageCounts });
 });
 
 module.exports = router;
