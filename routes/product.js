@@ -75,6 +75,7 @@ router.get("/", async (req, res) => {
   const qSize = req.query.size;
   const qColor = req.query.color;
   const qTitle = req.query.title;
+  const qSort = req.query.sort;
   let products;
   let pageCounts;
 
@@ -92,7 +93,18 @@ router.get("/", async (req, res) => {
       },
       {
         $facet: {
-          products: [{ $skip: perPage * (qPage - 1) }, { $limit: perPage }],
+          products: [
+            {
+              $sort:
+                qSort === "newest"
+                  ? { _id: -1 }
+                  : qSort === "asc"
+                  ? { price: 1 }
+                  : { price: -1 },
+            },
+            { $skip: perPage * (qPage - 1) },
+            { $limit: perPage },
+          ],
           totalCount: [{ $count: "count" }],
         },
       },
