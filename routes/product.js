@@ -104,7 +104,7 @@ router.get("/", async (req, res) => {
     products = await Product.find();
   }
 
-  if (!products?.length > 0) return res.status(404).json("products not found");
+  if (!products) return res.status(404).json("products not found");
 
   res.json({ products, pageCounts });
 });
