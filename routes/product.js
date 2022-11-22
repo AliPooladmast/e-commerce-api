@@ -76,12 +76,14 @@ router.get("/", async (req, res) => {
 
   if (qNew) {
     products = await Product.find().sort({ createdAt: -1 }).limit(8);
-  } else if (qCategory) {
-    products = await Product.find({ categories: { $in: [qCategory] } });
   } else if (qPage) {
-    products = await Product.find()
+    products = await Product.find({
+      ...(qCategory && { categories: { $in: [qCategory] } }),
+    })
       .limit(perPage)
       .skip(perPage * (qPage - 1));
+  } else {
+    products = await Product.find();
   }
 
   if (!products?.length > 0) return res.status(404).json("products not found");
