@@ -76,7 +76,7 @@ router.get("/", async (req, res) => {
   const qColor = req.query.color;
   const qTitle = req.query.title;
   let products;
-  let productCount;
+  let pageCounts;
 
   if (qNew) {
     products = await Product.find().sort({ createdAt: -1 }).limit(8);
@@ -99,7 +99,7 @@ router.get("/", async (req, res) => {
     ]);
 
     products = result[0].products;
-    pageCounts = result[0].totalCount[0].count / perPage;
+    pageCounts = Math.ceil(result[0].totalCount[0]?.count / perPage);
   } else {
     products = await Product.find();
   }
