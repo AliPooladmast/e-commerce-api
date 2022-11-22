@@ -23,7 +23,7 @@ router.put(
       req.params.id,
       { $set: req.body },
       { new: true }
-    );
+    ).select("-password");
 
     if (!updatedUser)
       return res.status(404).json("the user with the current ID was not found");
