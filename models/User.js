@@ -65,5 +65,17 @@ const createSchema = Joi.object({
   isAdmin: Joi.boolean(),
 });
 
+const editSchema = Joi.object({
+  username: Joi.string().min(2).max(50),
+  fullname: Joi.string().min(0).max(50),
+  phone: Joi.string().min(0).max(20),
+  address: Joi.string().min(0).max(511),
+  email: Joi.string()
+    .min(5)
+    .max(255)
+    .email({ minDomainSegments: 2, tlds: { allow: ["com", "net"] } }),
+});
+
 module.exports.User = mongoose.model("User", UserSchema);
-module.exports.schema = schema;
+module.exports.createSchema = createSchema;
+module.exports.editSchema = editSchema;
