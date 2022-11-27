@@ -4,13 +4,14 @@ const {
 } = require("../middleware/verifyToken");
 const router = require("express").Router();
 const CryptoJS = require("crypto-js");
-const { User } = require("../models/User");
+const { User, editSchema } = require("../models/User");
 const validateObjectId = require("../middleware/validateObjectId");
+const validateSchema = require("../middleware/validateSchema");
 
 //Upadate User
 router.put(
   "/:id",
-  [verifyTokenAutorize, validateObjectId],
+  [verifyTokenAutorize, validateObjectId, validateSchema(editSchema)],
   async (req, res) => {
     if (req.body.password) {
       req.body.password = CryptoJS.AES.encrypt(

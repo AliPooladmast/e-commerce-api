@@ -1,11 +1,11 @@
 const router = require("express").Router();
-const { User, schema } = require("../models/User");
+const { User, createSchema } = require("../models/User");
 const CryptoJS = require("crypto-js");
 const jwt = require("jsonwebtoken");
 const validateSchema = require("../middleware/validateSchema");
 
 //Register
-router.post("/register", validateSchema(schema), async (req, res) => {
+router.post("/register", validateSchema(createSchema), async (req, res) => {
   let user = await User.findOne({ email: req.body.email });
   if (user) return res.status(400).json("User already registered.");
 
