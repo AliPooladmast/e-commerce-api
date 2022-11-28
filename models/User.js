@@ -35,7 +35,7 @@ const UserSchema = new mongoose.Schema(
     },
     password: { type: String, required: true, minlength: 5, maxlength: 1023 },
     isAdmin: { type: Boolean, default: false },
-    img: { type: String },
+    img: { type: String, unique: true },
   },
   { timestamps: true }
 );
