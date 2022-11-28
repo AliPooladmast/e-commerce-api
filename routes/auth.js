@@ -9,9 +9,10 @@ router.post("/register", validateSchema(createSchema), async (req, res) => {
   let user = await User.findOne({ email: req.body.email });
   if (user) return res.status(400).json("User already registered.");
 
+  const { reqPassword, ...reqOthers } = req.body;
+
   user = new User({
-    username: req.body.username,
-    email: req.body.email,
+    ...reqOthers,
     password: CryptoJS.AES.encrypt(
       req.body.password,
       process.env.PASSWORD_SECRET_KEY
@@ -21,10 +22,10 @@ router.post("/register", validateSchema(createSchema), async (req, res) => {
   const savedUser = await user.save();
 
   const accessToken = savedUser.generateAuthToken();
-  const { password, ...others } = savedUser._doc;
-  others.token = accessToken;
+  const { resPassword, ...resOthers } = savedUser._doc;
+  resOthers.token = accessToken;
 
-  res.status(201).json(others);
+  res.status(201).json(resOthers);
 });
 
 //Login
