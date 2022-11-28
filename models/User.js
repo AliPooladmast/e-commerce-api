@@ -35,6 +35,7 @@ const UserSchema = new mongoose.Schema(
     },
     password: { type: String, required: true, minlength: 5, maxlength: 1023 },
     isAdmin: { type: Boolean, default: false },
+    img: { type: String },
   },
   { timestamps: true }
 );
@@ -70,6 +71,7 @@ const editSchema = Joi.object({
   fullname: Joi.string().min(0).max(50),
   phone: Joi.string().min(0).max(20),
   address: Joi.string().min(0).max(511),
+  img: Joi.string().min(0).max(1023),
   email: Joi.string()
     .min(5)
     .max(255)
