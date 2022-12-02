@@ -18,9 +18,37 @@ const ProductSchema = new mongoose.Schema(
       maxlength: 1024,
     },
     img: { type: String, required: true },
-    categories: { type: Array, required: true },
-    size: { type: Array },
-    color: { type: Array },
+    categories: {
+      type: [
+        {
+          type: String,
+          minlength: 1,
+          maxlength: 20,
+        },
+      ],
+      required: true,
+      validate: [arrayLimit, "{PATH} exceeds the limit of 10"],
+    },
+    size: {
+      type: [
+        {
+          type: String,
+          minlength: 1,
+          maxlength: 3,
+        },
+      ],
+      validate: [arrayLimit, "{PATH} exceeds the limit of 10"],
+    },
+    color: {
+      type: [
+        {
+          type: String,
+          minlength: 1,
+          maxlength: 20,
+        },
+      ],
+      validate: [arrayLimit, "{PATH} exceeds the limit of 10"],
+    },
     price: { type: Number, required: true, min: 0 },
     inStock: { type: Boolean, default: true },
   },
@@ -37,6 +65,10 @@ const schema = Joi.object({
   price: Joi.number().min(0).required(),
   inStock: Joi.boolean().default(true),
 });
+
+function arrayLimit(val) {
+  return val.length <= 10;
+}
 
 module.exports.Product = mongoose.model("Product", ProductSchema);
 module.exports.schema = schema;
