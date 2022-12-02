@@ -59,11 +59,11 @@ const schema = Joi.object({
   title: Joi.string().min(5).max(50).required().trim(),
   desc: Joi.string().min(5).max(1024).required(),
   img: Joi.string().required(),
-  categories: Joi.array().required(),
-  size: Joi.array(),
-  color: Joi.array(),
+  categories: Joi.array().required().max(10).items(Joi.string().min(1).max(20)),
+  size: Joi.array().max(10).items(Joi.string().min(1).max(3)),
+  color: Joi.array().max(10).items(Joi.string().min(1).max(20)),
   price: Joi.number().min(0).required(),
-  inStock: Joi.boolean().default(true),
+  inStock: Joi.number().min(0).required(),
 });
 
 function arrayLimit(val) {
