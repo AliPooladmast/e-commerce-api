@@ -13,11 +13,10 @@ const ProductSchema = new mongoose.Schema(
     },
     desc: {
       type: String,
-      required: true,
       minlength: 3,
       maxlength: 1024,
     },
-    img: { type: String, required: true },
+    img: { type: String },
     categories: {
       type: [
         {
@@ -26,7 +25,6 @@ const ProductSchema = new mongoose.Schema(
           maxlength: 20,
         },
       ],
-      required: true,
       validate: [arrayLimit, "{PATH} exceeds the limit of 10"],
     },
     size: {
@@ -37,6 +35,7 @@ const ProductSchema = new mongoose.Schema(
           maxlength: 5,
         },
       ],
+      required: true,
       validate: [arrayLimit, "{PATH} exceeds the limit of 10"],
     },
     color: {
@@ -47,6 +46,7 @@ const ProductSchema = new mongoose.Schema(
           maxlength: 20,
         },
       ],
+      required: true,
       validate: [arrayLimit, "{PATH} exceeds the limit of 10"],
     },
     price: { type: Number, required: true, min: 1 },
@@ -57,11 +57,11 @@ const ProductSchema = new mongoose.Schema(
 
 const schema = Joi.object({
   title: Joi.string().min(3).max(50).required().trim(),
-  desc: Joi.string().min(3).max(1024).required(),
-  img: Joi.string().required(),
-  categories: Joi.array().required().max(10).items(Joi.string().min(1).max(20)),
-  size: Joi.array().max(10).items(Joi.string().min(1).max(5)),
-  color: Joi.array().max(10).items(Joi.string().min(1).max(20)),
+  desc: Joi.string().min(3).max(1024),
+  img: Joi.string(),
+  categories: Joi.array().max(10).items(Joi.string().min(1).max(20)),
+  size: Joi.array().required().max(10).items(Joi.string().min(1).max(5)),
+  color: Joi.array().required().max(10).items(Joi.string().min(1).max(20)),
   price: Joi.number().min(1).required(),
   inStock: Joi.number().min(1).required(),
 });
