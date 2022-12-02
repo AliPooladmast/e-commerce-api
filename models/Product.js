@@ -50,7 +50,7 @@ const ProductSchema = new mongoose.Schema(
       validate: [arrayLimit, "{PATH} exceeds the limit of 10"],
     },
     price: { type: Number, required: true, min: 0 },
-    inStock: { type: Boolean, default: true },
+    inStock: { type: Number, required: true, min: 1 },
   },
   { timestamps: true }
 );
