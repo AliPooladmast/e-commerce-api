@@ -3,7 +3,7 @@ const router = require("express").Router();
 const { Product, schema } = require("../models/Product");
 const validateObjectId = require("../middleware/validateObjectId");
 const validate = require("../middleware/validateSchema");
-const perPage = 2;
+const perPage = 10;
 
 //Create Product
 router.post("/", [verifyTokenAdmin, validate(schema)], async (req, res) => {
@@ -88,7 +88,7 @@ router.get("/", async (req, res) => {
           ...(qCategory && { categories: { $in: [qCategory] } }),
           ...(qSize && { size: { $in: [qSize] } }),
           ...(qColor && { color: { $in: [qColor] } }),
-          ...(qTitle && { title: { $regex: qTitle } }),
+          ...(qTitle && { title: { $regex: qTitle, $options: "i" } }),
         },
       },
       {

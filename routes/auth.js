@@ -1,17 +1,18 @@
 const router = require("express").Router();
-const { User, schema } = require("../models/User");
+const { User, createSchema } = require("../models/User");
 const CryptoJS = require("crypto-js");
 const jwt = require("jsonwebtoken");
 const validateSchema = require("../middleware/validateSchema");
 
 //Register
-router.post("/register", validateSchema(schema), async (req, res) => {
+router.post("/register", validateSchema(createSchema), async (req, res) => {
   let user = await User.findOne({ email: req.body.email });
   if (user) return res.status(400).json("User already registered.");
 
+  const { reqPassword, ...reqOthers } = req.body;
+
   user = new User({
-    username: req.body.username,
-    email: req.body.email,
+    ...reqOthers,
     password: CryptoJS.AES.encrypt(
       req.body.password,
       process.env.PASSWORD_SECRET_KEY
@@ -21,10 +22,10 @@ router.post("/register", validateSchema(schema), async (req, res) => {
   const savedUser = await user.save();
 
   const accessToken = savedUser.generateAuthToken();
-  const { password, ...others } = savedUser._doc;
-  others.token = accessToken;
+  const { resPassword, ...resOthers } = savedUser._doc;
+  resOthers.token = accessToken;
 
-  res.status(201).json(others);
+  res.status(201).json(resOthers);
 });
 
 //Login
