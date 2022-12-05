@@ -88,7 +88,7 @@ router.get("/", async (req, res) => {
           ...(qCategory && { categories: { $in: [qCategory] } }),
           ...(qSize && { size: { $in: [qSize] } }),
           ...(qColor && { color: { $in: [qColor] } }),
-          ...(qTitle && { title: { $regex: qTitle } }),
+          ...(qTitle && { title: { $regex: qTitle, $options: "i" } }),
         },
       },
       {
