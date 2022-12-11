@@ -19,6 +19,9 @@ router.post(
       _id: { $in: productIds },
     });
 
+    if (!dbProducts)
+      return res.status(404).json("there are no such products on DB");
+
     const lineItems = dbProducts.reverse().map((item, index) => ({
       price_data: {
         currency: "usd",
@@ -30,22 +33,20 @@ router.post(
       quantity: products[index].quantity,
     }));
 
-    if (lineItems) {
-      const session = await stripe.checkout.sessions.create({
-        line_items: lineItems,
-        mode: "payment",
-      });
+    const session = await stripe.checkout.sessions.create({
+      line_items: lineItems,
+      mode: "payment",
+    });
 
-      const newOrder = new Order({
-        ...req.body,
-        userId: req.params.id,
-        amount: session.amount_total,
-        status: session.payment_status,
-      });
-      const savedOrder = await newOrder.save();
+    const newOrder = new Order({
+      ...req.body,
+      userId: req.params.id,
+      amount: session.amount_total,
+      status: session.payment_status,
+    });
+    const savedOrder = await newOrder.save();
 
-      res.json(savedOrder.status);
-    }
+    res.json(savedOrder.status);
   }
 );
 
