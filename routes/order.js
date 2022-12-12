@@ -37,14 +37,21 @@ router.delete(
   "/:id",
   [verifyTokenAutorize, validateObjectId],
   async (req, res) => {
-    const order = await Order.findByIdAndDelete(req.params.id);
+    const order = await Order.findById(req.query.orderId);
 
     if (!order)
       return res
         .status(404)
         .json("the order with the current ID was not found");
 
-    res.json("order has been deleted...");
+    if (order.userId !== req.params.id)
+      return res
+        .status(403)
+        .json("you are not allowd to remove other users orders");
+
+    const deletedOrder = order.remove();
+
+    if (deletedOrder) return res.json("order has been deleted...");
   }
 );
 
