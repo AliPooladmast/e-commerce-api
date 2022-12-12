@@ -8,6 +8,7 @@ const CryptoJS = require("crypto-js");
 const { Order, schema } = require("../models/Order");
 const validateObjectId = require("../middleware/validateObjectId");
 const validate = require("../middleware/validateSchema");
+const { Product } = require("../models/Product");
 
 //Create Order
 router.post("/", [verifyToken, validate(schema)], async (req, res) => {
@@ -52,6 +53,33 @@ router.delete(
     const deletedOrder = order.remove();
 
     if (deletedOrder) return res.json("order has been deleted...");
+  }
+);
+
+//Get Order Products
+router.get(
+  "/products/:id",
+  [verifyToken, validateObjectId],
+  async (req, res) => {
+    const order = await Order.findById(req.params.id);
+
+    if (!order)
+      return res
+        .status(404)
+        .json("the order with the current ID was not found");
+
+    const productIds = order.products.map((item) => item.productId);
+
+    const orderProducts = await Product.find({
+      _id: { $in: productIds },
+    });
+
+    const result = orderProducts.reverse().map((item, index) => ({
+      ...item._doc,
+      quantity: order.products[index].quantity,
+    }));
+
+    res.json(result);
   }
 );
 
