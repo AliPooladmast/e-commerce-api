@@ -5,13 +5,13 @@ const {
 } = require("../middleware/verifyToken");
 const router = require("express").Router();
 const CryptoJS = require("crypto-js");
-const { Order, schema } = require("../models/Order");
+const { Order, createSchema, editSchema } = require("../models/Order");
 const validateObjectId = require("../middleware/validateObjectId");
 const validate = require("../middleware/validateSchema");
 const { Product } = require("../models/Product");
 
 //Create Order
-router.post("/", [verifyToken, validate(schema)], async (req, res) => {
+router.post("/", [verifyToken, validate(createSchema)], async (req, res) => {
   const newOrder = new Order(req.body);
 
   const savedOrder = await newOrder.save();
@@ -20,23 +20,33 @@ router.post("/", [verifyToken, validate(schema)], async (req, res) => {
 });
 
 //Upadate Order
-router.put("/:id", [verifyTokenAdmin, validateObjectId], async (req, res) => {
-  const updatedOrder = await Order.findByIdAndUpdate(
-    req.params.id,
-    { $set: req.body },
-    { new: true }
-  );
+router.put(
+  "/:id",
+  [validateObjectId, verifyTokenAutorize, validate(editSchema)],
+  async (req, res) => {
+    const order = await Order.findById(req.query.orderId);
 
-  if (!updatedOrder)
-    return res.status(404).json("the order with the current ID was not found");
+    if (!order)
+      return res
+        .status(404)
+        .json("the order with the current ID was not found");
 
-  res.json(updatedOrder);
-});
+    if (order.userId !== req.params.id)
+      return res
+        .status(403)
+        .json("you are not allowd to change other users orders");
+
+    order.set(req.body);
+    const updatedOrder = await order.save();
+
+    res.json(updatedOrder);
+  }
+);
 
 //Delete Order
 router.delete(
   "/:id",
-  [verifyTokenAutorize, validateObjectId],
+  [validateObjectId, verifyTokenAutorize],
   async (req, res) => {
     const order = await Order.findById(req.query.orderId);
 
@@ -50,7 +60,7 @@ router.delete(
         .status(403)
         .json("you are not allowd to remove other users orders");
 
-    const deletedOrder = order.remove();
+    const deletedOrder = await order.remove();
 
     if (deletedOrder) return res.json("order has been deleted...");
   }
