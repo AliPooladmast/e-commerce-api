@@ -42,7 +42,7 @@ const OrderSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-const schema = Joi.object({
+const createSchema = Joi.object({
   products: Joi.array()
     .required()
     .min(1)
@@ -57,9 +57,15 @@ const schema = Joi.object({
   address: Joi.string().min(5).max(511).required(),
 });
 
+const editSchema = Joi.object({
+  phone: Joi.string().min(5).max(20).required(),
+  address: Joi.string().min(5).max(511).required(),
+});
+
 function arrayLimit(val) {
   return val.length <= 100;
 }
 
 module.exports.Order = mongoose.model("Order", OrderSchema);
-module.exports.schema = schema;
+module.exports.createSchema = createSchema;
+module.exports.editSchema = editSchema;
