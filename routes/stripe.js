@@ -2,14 +2,14 @@ const router = require("express").Router();
 const Stripe = require("stripe");
 const { verifyTokenAutorize } = require("../middleware/verifyToken");
 const { Product } = require("../models/Product");
-const { schema, Order } = require("../models/Order");
+const { createSchema, Order } = require("../models/Order");
 const validateSchema = require("../middleware/validateSchema");
 const validateObjectId = require("../middleware/validateObjectId");
 const stripe = Stripe(process.env.STRIPE_KEY);
 
 router.post(
   "/create-session/:id",
-  [validateObjectId, verifyTokenAutorize, validateSchema(schema)],
+  [validateObjectId, verifyTokenAutorize, validateSchema(createSchema)],
   async (req, res) => {
     const { products } = req.body;
 
@@ -46,7 +46,7 @@ router.post(
     });
     const savedOrder = await newOrder.save();
 
-    res.json(savedOrder.status);
+    res.json(savedOrder);
   }
 );
 
