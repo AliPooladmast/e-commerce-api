@@ -8,6 +8,18 @@ const OrderSchema = new mongoose.Schema(
       type: [
         {
           productId: { type: String, required: true },
+          size: {
+            type: String,
+            minlength: 1,
+            maxlength: 5,
+            required: true,
+          },
+          color: {
+            type: String,
+            minlength: 1,
+            maxlength: 20,
+            required: true,
+          },
           quantity: {
             type: Number,
             default: 1,
@@ -50,6 +62,8 @@ const createSchema = Joi.object({
     .items(
       Joi.object({
         productId: Joi.string().hex().required(),
+        size: Joi.string().min(1).max(5).required(),
+        color: Joi.string().min(1).max(20).required(),
         quantity: Joi.number().min(1).max(10),
       })
     ),
