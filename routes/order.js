@@ -11,13 +11,17 @@ const validate = require("../middleware/validateSchema");
 const { Product } = require("../models/Product");
 
 //Create Order
-router.post("/", [verifyToken, validate(createSchema)], async (req, res) => {
-  const newOrder = new Order(req.body);
+router.post(
+  "/",
+  [verifyTokenAdmin, validate(createSchema)],
+  async (req, res) => {
+    const newOrder = new Order(req.body);
 
-  const savedOrder = await newOrder.save();
+    const savedOrder = await newOrder.save();
 
-  res.json(savedOrder);
-});
+    res.json(savedOrder);
+  }
+);
 
 //Upadate Order
 router.put(
@@ -86,6 +90,8 @@ router.get(
 
     const result = orderProducts.reverse().map((item, index) => ({
       ...item._doc,
+      size: order.products[index].size,
+      color: order.products[index].color,
       quantity: order.products[index].quantity,
     }));
 
