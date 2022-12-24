@@ -117,7 +117,7 @@ router.get(
 
 //Get All Orders
 router.get("/", verifyTokenAdmin, async (req, res) => {
-  const orders = await Order.find();
+  const orders = await Order.find().sort({ createdAt: -1 });
 
   if (!orders?.length > 0) return res.status(404).json("orders not found");
 
