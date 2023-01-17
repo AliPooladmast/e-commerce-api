@@ -1,4 +1,4 @@
-# Shopinity API
+# ForgeShopex API
 
 ## Technologies
 
