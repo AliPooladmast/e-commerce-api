@@ -4,6 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "db:down": "migrate-mongo down",
+    "db:up": "migrate-mongo up",
     "start": "node index.js",
     "dev": "nodemon index.js"
   },
@@ -27,8 +29,11 @@
     "joi": "^17.6.4",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^6.5.2",
-    "nodemon": "^2.0.19",
     "stripe": "^10.8.0",
     "winston": "^3.8.2"
+  },
+  "devDependencies": {
+    "migrate-mongo": "^10.0.0",
+    "nodemon": "^2.0.22"
   }
 }
